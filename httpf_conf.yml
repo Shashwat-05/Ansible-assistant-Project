@@ -1,0 +1,47 @@
+- hosts: 192.168.29.210
+  vars_prompt:
+          - name: new_dr
+            prompt: "enter path of new documentroot "
+            private: no
+          - name: new_file
+            prompt: "enter the name of httpd config file"
+            private: no
+          - name: new_port
+            prompt: "enter the new httpd port"
+            private: no
+          - name: html_file
+            prompt: "enter the html file name"
+            private: no
+          - name: html_content
+            prompt: "content "
+            private: no
+  tasks:
+  - name: creating new document root
+    file:
+          state: directory
+          path: "/var/www/{{ new_dr }}"
+  - copy:
+          dest: "/var/www/{{ new_dr }}/{{ html_file }}.html"
+          content: "{{ html_content }}"
+
+  - name: configuring new httpd service
+    template:
+          src: "/httpd_ansible.conf"
+          dest: "/etc/httpd/conf.d/{{ new_file }}.conf"
+    notify: restart httpd
+
+  - name: refresh firewall service
+    command: systemctl restart firewalld
+  - firewalld:
+          port: "{{ new_port }}/tcp"
+          state: enabled
+          immediate: yes
+          permanent: yes
+  
+  handlers:
+  - name: restart httpd
+    service:
+          name: "httpd"
+          state: restarted
+          enabled: yes
+
