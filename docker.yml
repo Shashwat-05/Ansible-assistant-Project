@@ -1,0 +1,67 @@
+- hosts: 192.168.29.98
+  vars_prompt:
+  - name: img_name
+    prompt: "enter image to pull"
+    private: no
+
+  - name: cont_name
+    prompt: "enter container name"
+    private: no
+
+  - name: data
+    prompt: "enter data for html file"
+    private: no  
+
+  tasks:
+  - name: copy docker repository..........
+    copy:
+          src: "/etc/yum.repos.d/docker.repo"
+          dest: "/etc/yum.repos.d/docker.repo"
+
+  - name: Installing docker package ......................
+    package:
+          name: "docker-ce"
+          state: present
+
+  - name: starting docker service.............
+    service:
+          name: "docker"
+          state: started
+          enabled: yes
+
+  - name: creating directory.......
+    file:
+            state: directory
+            name: "/dkrvol"
+  
+  - name: copying html file............
+    copy:
+           content: "{{ data }}"
+           dest: "/dkrvol/web.html"    
+  - name: pip installing docker ........
+    pip:
+          name: docker
+   
+ 
+  - name: stopping selinux
+    selinux:
+            policy: targeted
+            state: permissive
+ 
+  - name: pulling docker image ....................       
+    docker_image:
+          name: "{{ img_name }}"
+          source: pull
+
+  - docker_container:
+          name: "{{ cont_name }}"
+          image: "{{ img_name }}"
+          interactive: yes
+          detach: yes
+          ports:
+          - "1234:80"
+          state: started
+          volumes:
+          - /dkrvol/:/usr/local/apache2/htdocs/
+
+
