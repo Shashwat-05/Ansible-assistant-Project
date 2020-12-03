@@ -1,0 +1,146 @@
+- hosts: master
+  gather_facts: no
+  ignore_errors: yes
+  vars:
+          - cluster_ip: 0.0.0.0
+          - node_type: name
+  vars_prompt:
+          - name: node_dir
+            private: no
+            prompt: "path name of namenode storage"
+          - name: hdfs_port
+            private: no
+            prompt: "cluster port [suggest-9001]"
+
+  tasks:
+
+          - name: checking if hadoop installed or not
+            yum:
+                  list: hadoop
+            register: hadoop
+           
+
+          - name: checking if jdk installed or not
+            yum:
+                  list: jdk
+            register: jdk
+          
+           
+          - name: 'copying hadoop rpm ; if not exist'
+            copy:
+                    src: '/root/hadoop.rpm'
+                    dest: '/root'
+
+          - name: 'copying jdk rpm ; if not exist'
+            copy:
+                    src: '/root/jdk.rpm'
+                    dest: '/root'                 
+                    
+          - name: installing jdk.rpm ; if not installed
+            command: rpm -i jdk.rpm
+            when:  jdk.results == []
+            
+            
+          - name:  installing hadoop.rpm ; if not installed
+            command: rpm -i hadoop.rpm --force
+            when: hadoop.results == []
+            
+          - name: modifying hdfs-site.xml file
+            template:
+                    src: "/ws1/cluster/hdfs-site.xml"
+                    dest: "/etc/hadoop/hdfs-site.xml"
+                    
+          - name: modifying core-site.xml
+            template:
+                    dest: "/etc/hadoop/core-site.xml"
+                    src: "/ws1/cluster/core-site.xml"
+
+          - name: formatting the namenode dir............
+            command: hadoop namenode -format
+           
+          
+          - name: stopping firewall temporarily....
+            service: 
+                name: "firewalld"
+                state: stopped
+
+          - name:  start_namenode
+            command: hadoop-daemon.sh start namenode
+
+
+
+- hosts: datanodes
+  gather_facts: no
+  ignore_errors: yes
+  vars:
+          - node_type: data
+  vars_prompt:
+          - name: cluster_ip
+            private: no
+            prompt: "provide masternode's IP"
+          - name: node_dir
+            private: no
+            prompt: "path name of datanode storage"
+          - name: hdfs_port
+            private: no
+            prompt: "cluster port [suggest-9001]"
+
+  tasks:
+
+          - name: checking if hadoop installed or not
+            yum:
+                  list: hadoop
+            register: hadoop
+           
+
+          - name: checking if jdk installed or not
+            yum:
+                  list: jdk
+            register: jdk
+          
+           
+          - name: 'copying hadoop rpm ; if not exist'
+            copy:
+                    src: '/root/hadoop.rpm'
+                    dest: '/root'
+
+          - name: 'copying jdk rpm ; if not exist'
+            copy:
+                    src: '/root/jdk.rpm'
+                    dest: '/root'                 
+                    
+          - name: installing jdk.rpm ; if not installed
+            command: rpm -i jdk.rpm
+            when:  jdk.results == []
+            
+            
+          - name:  installing hadoop.rpm ; if not installed
+            command: rpm -i hadoop.rpm --force
+            when: hadoop.results == []
+            
+          - name: modifying hdfs-site.xml file of datanode
+            template:
+                    src: "/ws1/cluster/hdfs-site.xml"
+                    dest: "/etc/hadoop/hdfs-site.xml"
+                    
+          - name: modifying core-site.xml of datanode
+            template:
+                    dest: "/etc/hadoop/core-site.xml"
+                    src: "/ws1/cluster/core-site.xml"
+
+          - name: stopping firewall temporarily ........
+            service:
+                    name: "firewalld"
+                    state: stopped
+          
+          - name: starting datanode service ..............
+            command: hadoop-daemon.sh start datanode
+
+          - name: gathering cluster report
+            command: hadoop dfsadmin -report
+            register: report
+
+          - name: report of entire cluster....
+            debug:
+                    msg: "{{ report }}"
+
