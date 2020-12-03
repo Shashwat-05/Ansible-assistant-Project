@@ -19,9 +19,11 @@
           dest: "/etc/yum.repos.d/docker.repo"
 
   - name: Installing docker package ......................
-    package:
-          name: "docker-ce"
+     dnf:
+          name: docker-ce
           state: present
+          no_best: yes
+          skip_broken: yes
 
   - name: starting docker service.............
     service:
