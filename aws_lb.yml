@@ -1,0 +1,69 @@
+- hosts: aws_servers
+  vars_prompt:
+          - name: file
+            private: no
+            prompt: "enter the webapp file name"
+
+  tasks:
+          - name: installing apache services...
+            package:
+                    name: httpd
+                    state: present
+          - name: installing php package
+            package:
+                    name: php
+                    state: present
+          - copy:
+                  dest: "/var/www/html/{{ file }}.php"
+                  content: |
+                          <pre>
+                          <?php
+                          print `/usr/sbin/ifconfig`;
+                          ?>
+                          </pre>
+            notify: httpd_s
+  handlers:
+          - name: httpd_s
+            service:
+                    name: httpd
+                    state: restarted
+- hosts: aws_lb
+  vars_prompt:
+          - name: port_fs
+            prompt: " port of front end server [8080]"
+            private: no
+          - name: port_bs
+            prompt: "port of back end servers [80]"
+            private: no
+
+  tasks:
+          - name: installing haproxy.......
+            package:
+                    name: haproxy
+                    state: present
+          - name: installing apache services...
+            package:
+                    name: httpd
+                    state: present
+
+          - name: updating the port of protocol
+            template:
+                    dest: "/etc/haproxy/haproxy.cfg"
+                    src: "/ws1/aws/haproxy.cfg.j2"
+            notify: 
+            - start_haproxy
+            - start_httpd
+
+ 
+  handlers:
+          - name: start_haproxy
+            service:
+                    name: haproxy
+                    state: restarted
+
+          - name: start_httpd
+            service:
+                    name: haproxy
+                    state: restarted
+
+
