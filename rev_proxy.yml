@@ -1,0 +1,40 @@
+
+- hosts: Load_Balancer
+  vars_prompt:
+          - name: port_fs
+            prompt: " port of front end server [8080]"
+            private: no
+          - name: port_bs
+            prompt: "port of back end servers [80]"
+            private: no
+
+  tasks:
+          - name: installing haproxy.......
+            package:
+                    name: haproxy
+                    state: present
+
+          - name: installing apache services
+            package:
+                    name: httpd
+                    state: present
+
+          - name: updating the port of protocol
+            template:
+                    dest: "/etc/haproxy/haproxy.cfg"
+                    src: "haproxy.cfg.j2"
+            notify: 
+            - start_httpd
+            - start_haproxy
+
+ 
+  handlers:
+          - name: start_haproxy
+            service:
+                    name: haproxy
+                    state: restarted
+          - name: start_httpd
+            service:
+                    name: httpd
+                    state: restarted
+
