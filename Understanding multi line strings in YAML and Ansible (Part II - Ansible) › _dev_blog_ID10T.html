@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<!-- saved from url=(0056)https://adminswerk.de/multi-line-string-yaml-ansible-II/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="apple-touch-icon" sizes="57x57" href="https://adminswerk.de/apple-touch-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="https://adminswerk.de/apple-touch-icon-60x60.png">
+    <link rel="icon" type="image/png" href="https://adminswerk.de/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="https://adminswerk.de/favicon-16x16.png" sizes="16x16">
+    <link rel="manifest" href="https://adminswerk.de/manifest.json">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <!-- Niklas Buschmann 2015 MIT <http://github.com/niklasbuschmann> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    <meta name="description" content="Because /dev/random is too predictable.">
+    <title> Understanding multi line strings in YAML and Ansible (Part II - Ansible) › /dev/blog/ID10T</title>
+    <link rel="canonical" href="https://adminswerk.de/multi-line-string-yaml-ansible-II/">
+    <link href="./Understanding multi line strings in YAML and Ansible (Part II - Ansible) › _dev_blog_ID10T_files/main.css" rel="stylesheet" type="text/css">
+    <link href="./Understanding multi line strings in YAML and Ansible (Part II - Ansible) › _dev_blog_ID10T_files/fonts.css" rel="stylesheet" type="text/css">
+    <link href="./Understanding multi line strings in YAML and Ansible (Part II - Ansible) › _dev_blog_ID10T_files/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link rel="alternate" type="application/rss+xml" title="/dev/blog/ID10T » Feed" href="https://adminswerk.de/feed.xml">
+    
+      <!-- Comments powered by isso -->
+      
+        <script type="text/javascript" async="" defer="" src="./Understanding multi line strings in YAML and Ansible (Part II - Ansible) › _dev_blog_ID10T_files/piwik.js.download"></script><script defer="" data-isso="https://comments.adminswerk.de" data-isso-reply-to-self="true" data-isso-require-author="false" data-isso-require-email="false" data-isso-vote="true" data-isso-reply-notifications="false" src="./Understanding multi line strings in YAML and Ansible (Part II - Ansible) › _dev_blog_ID10T_files/embed.min.js.download"></script>
+      
+    
+    <!-- Begin Cookie Consent plugin by Silktide - http://silktide.com/cookieconsent -->
+<link rel="stylesheet" type="text/css" href="./Understanding multi line strings in YAML and Ansible (Part II - Ansible) › _dev_blog_ID10T_files/cookieconsent.min.css">
+<script src="./Understanding multi line strings in YAML and Ansible (Part II - Ansible) › _dev_blog_ID10T_files/cookieconsent.min.js.download"></script>
+<script>
+  window.addEventListener("load", function(){
+  window.cookieconsent.initialise({
+    "palette": {
+      "popup": {
+        "background": "#252e39"
+      },
+      "button": {
+        "background": "#14a7d0"
+      }
+    },
+    "theme": "edgeless",
+    "content": {
+      "message": "We may use cookies for one or more of the following features: To personalise content and ads, to provide social media features and to analyse our traffic. We also share information about your use of our site with our social media, advertising and analytics partners.",
+      "dismiss": "Okay",
+      "href": "https://adminswerk.de/privacy-statement/"
+    }
+  })});
+</script>
+<!-- End Cookie Consent plugin -->
+    <!-- Matomo -->
+<script type="text/javascript">
+  var _paq = _paq || [];
+  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+  _paq.push(["setDoNotTrack", true]);
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="https://piwik.tillwiese.de/";
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', '1']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<noscript><p><img src="https://piwik.tillwiese.de/piwik.php?idsite=1&amp;rec=1" style="border:0;" alt="" /></p></noscript>
+<!-- End Matomo Code -->
+    <script data-ad-client="ca-pub-7586970907106458" async="" src="./Understanding multi line strings in YAML and Ansible (Part II - Ansible) › _dev_blog_ID10T_files/f.txt"></script>
+    <style>
+      .gad_default { width: 320px; height: 50px; }
+      @media(min-width: 500px) { .gad_default { width: 468px; height: 60px; } }
+      @media(min-width: 800px) { .gad_default { width: 728px; height: 90px; } }
+    </style>
+  <style id="isso-style" type="text/css">#isso-thread * {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+#isso-thread .isso-comment-header a {
+    text-decoration: none;
+}
+
+#isso-thread {
+    padding: 0;
+    margin: 0;
+}
+#isso-thread > h4 {
+    color: #555;
+    font-weight: bold;
+}
+#isso-thread > .isso-feedlink {
+    float: right;
+    padding-left: 1em;
+}
+#isso-thread > .isso-feedlink > a {
+    font-size: 0.8em;
+    vertical-align: bottom;
+}
+#isso-thread .textarea {
+    min-height: 58px;
+    outline: 0;
+}
+#isso-thread .textarea.placeholder {
+    color: #757575;
+}
+
+#isso-root .isso-comment {
+    max-width: 68em;
+    padding-top: 0.95em;
+    margin: 0.95em auto;
+}
+#isso-root .preview .isso-comment {
+    padding-top: 0;
+    margin: 0;
+}
+#isso-root .isso-comment:not(:first-of-type),
+.isso-follow-up .isso-comment {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+.isso-comment > div.avatar {
+    display: block;
+    float: left;
+    width: 7%;
+    margin: 3px 15px 0 0;
+}
+.isso-comment > div.avatar > svg {
+    max-width: 48px;
+    max-height: 48px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+.isso-comment > div.text-wrapper {
+    display: block;
+}
+.isso-comment .isso-follow-up {
+    padding-left: calc(7% + 20px);
+}
+.isso-comment > div.text-wrapper > .isso-comment-header, .isso-comment > div.text-wrapper > .isso-comment-footer {
+    font-size: 0.95em;
+}
+.isso-comment > div.text-wrapper > .isso-comment-header {
+    font-size: 0.85em;
+}
+.isso-comment > div.text-wrapper > .isso-comment-header .spacer {
+    padding: 0 6px;
+}
+.isso-comment > div.text-wrapper > .isso-comment-header .spacer,
+.isso-comment > div.text-wrapper > .isso-comment-header a.permalink,
+.isso-comment > div.text-wrapper > .isso-comment-header .note,
+.isso-comment > div.text-wrapper > .isso-comment-header a.parent {
+    color: gray !important;
+    font-weight: normal;
+    text-shadow: none !important;
+}
+.isso-comment > div.text-wrapper > .isso-comment-header .spacer:hover,
+.isso-comment > div.text-wrapper > .isso-comment-header a.permalink:hover,
+.isso-comment > div.text-wrapper > .isso-comment-header .note:hover,
+.isso-comment > div.text-wrapper > .isso-comment-header a.parent:hover {
+    color: #606060 !important;
+}
+.isso-comment > div.text-wrapper > .isso-comment-header .note {
+    float: right;
+}
+.isso-comment > div.text-wrapper > .isso-comment-header .author {
+    font-weight: bold;
+    color: #555;
+}
+.isso-comment > div.text-wrapper > .textarea-wrapper .textarea,
+.isso-comment > div.text-wrapper > .textarea-wrapper .preview {
+    margin-top: 0.2em;
+}
+.isso-comment > div.text-wrapper > div.text p {
+    margin-top: 0.2em;
+}
+.isso-comment > div.text-wrapper > div.text p:last-child {
+    margin-bottom: 0.2em;
+}
+.isso-comment > div.text-wrapper > div.text h1,
+.isso-comment > div.text-wrapper > div.text h2,
+.isso-comment > div.text-wrapper > div.text h3,
+.isso-comment > div.text-wrapper > div.text h4,
+.isso-comment > div.text-wrapper > div.text h5,
+.isso-comment > div.text-wrapper > div.text h6 {
+    font-size: 130%;
+    font-weight: bold;
+}
+.isso-comment > div.text-wrapper > div.textarea-wrapper .textarea,
+.isso-comment > div.text-wrapper > div.textarea-wrapper .preview {
+    width: 100%;
+    border: 1px solid #f0f0f0;
+    border-radius: 2px;
+    box-shadow: 0 0 2px #888;
+}
+.isso-comment > div.text-wrapper > .isso-comment-footer {
+    font-size: 0.80em;
+    color: gray !important;
+    clear: left;
+}
+.isso-feedlink,
+.isso-comment > div.text-wrapper > .isso-comment-footer a {
+    font-weight: bold;
+    text-decoration: none;
+}
+.isso-feedlink:hover,
+.isso-comment > div.text-wrapper > .isso-comment-footer a:hover {
+    color: #111111 !important;
+    text-shadow: #aaaaaa 0 0 1px !important;
+}
+.isso-comment > div.text-wrapper > .isso-comment-footer > a {
+    position: relative;
+    top: .2em;
+}
+.isso-comment > div.text-wrapper > .isso-comment-footer > a + a {
+    padding-left: 1em;
+}
+.isso-comment > div.text-wrapper > .isso-comment-footer .votes {
+    color: gray;
+}
+.isso-comment > div.text-wrapper > .isso-comment-footer .upvote svg,
+.isso-comment > div.text-wrapper > .isso-comment-footer .downvote svg {
+    position: relative;
+    top: .2em;
+}
+.isso-comment .isso-postbox {
+    margin-top: 0.8em;
+}
+.isso-comment.isso-no-votes span.votes {
+    display: none;
+}
+
+.isso-postbox {
+    max-width: 68em;
+    margin: 0 auto 2em;
+    clear: right;
+}
+.isso-postbox > .form-wrapper {
+    display: block;
+    padding: 0;
+}
+.isso-postbox > .form-wrapper > .auth-section,
+.isso-postbox > .form-wrapper > .auth-section .post-action {
+    display: block;
+}
+.isso-postbox > .form-wrapper .textarea,
+.isso-postbox > .form-wrapper .preview {
+    margin: 0 0 .3em;
+    padding: .4em .8em;
+    border-radius: 3px;
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+.isso-postbox > .form-wrapper input[type=checkbox] {
+    vertical-align: middle;
+    position: relative;
+    bottom: 1px;
+    margin-left: 0;
+}
+.isso-postbox > .form-wrapper .notification-section {
+    font-size: 0.90em;
+    padding-top: .3em;
+}
+#isso-thread .textarea:focus,
+#isso-thread input:focus {
+    border-color: rgba(0, 0, 0, 0.8);
+}
+.isso-postbox > .form-wrapper > .auth-section .input-wrapper {
+    display: inline-block;
+    position: relative;
+    max-width: 25%;
+    margin: 0;
+}
+.isso-postbox > .form-wrapper > .auth-section .input-wrapper input {
+    padding: .3em 10px;
+    max-width: 100%;
+    border-radius: 3px;
+    background-color: #fff;
+    line-height: 1.4em;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+.isso-postbox > .form-wrapper > .auth-section .post-action {
+    display: inline-block;
+    float: right;
+    margin: 0 0 0 5px;
+}
+.isso-postbox > .form-wrapper > .auth-section .post-action > input {
+    padding: calc(.3em - 1px);
+    border-radius: 2px;
+    border: 1px solid #CCC;
+    background-color: #DDD;
+    cursor: pointer;
+    outline: 0;
+    line-height: 1.4em;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+.isso-postbox > .form-wrapper > .auth-section .post-action > input:hover {
+    background-color: #CCC;
+}
+.isso-postbox > .form-wrapper > .auth-section .post-action > input:active {
+    background-color: #BBB;
+}
+.isso-postbox > .form-wrapper .preview,
+.isso-postbox > .form-wrapper input[name="edit"],
+.isso-postbox.preview-mode > .form-wrapper input[name="preview"],
+.isso-postbox.preview-mode > .form-wrapper .textarea {
+    display: none;
+}
+.isso-postbox.preview-mode > .form-wrapper .preview {
+    display: block;
+}
+.isso-postbox.preview-mode > .form-wrapper input[name="edit"] {
+    display: inline;
+}
+.isso-postbox > .form-wrapper .preview {
+    background-color: #f8f8f8;
+    background: repeating-linear-gradient(
+        -45deg,
+        #f8f8f8,
+        #f8f8f8 10px,
+        #fff 10px,
+        #fff 20px
+    );
+}
+.isso-postbox > .form-wrapper > .notification-section {
+    display: none;
+    padding-bottom: 10px;
+}
+@media screen and (max-width:600px) {
+    .isso-postbox > .form-wrapper > .auth-section .input-wrapper {
+        display: block;
+        max-width: 100%;
+        margin: 0 0 .3em;
+    }
+    .isso-postbox > .form-wrapper > .auth-section .input-wrapper input {
+        width: 100%;
+    }
+}
+</style><style></style></head>
+  <body><div role="dialog" aria-live="polite" aria-label="cookieconsent" aria-describedby="cookieconsent:desc" class="cc-window cc-banner cc-type-info cc-theme-edgeless cc-bottom cc-color-override-530831885 " style=""><!--googleoff: all--><span id="cookieconsent:desc" class="cc-message">We may use cookies for one or more of the following features: To personalise content and ads, to provide social media features and to analyse our traffic. We also share information about your use of our site with our social media, advertising and analytics partners. <a aria-label="learn more about cookies" role="button" tabindex="0" class="cc-link" href="https://adminswerk.de/privacy-statement/" target="_blank">Learn more</a></span><div class="cc-compliance"><a aria-label="dismiss cookie message" role="button" tabindex="0" class="cc-btn cc-dismiss">Okay</a></div><!--googleon: all--></div>
+    <header>
+      <h1><a href="https://adminswerk.de/">/dev/blog/ID10T</a></h1>
+      <nav>
+        <ul>
+          <li><a href="https://adminswerk.de/">Home</a></li>
+      <li><a href="https://adminswerk.de/about/">About</a></li><li><a href="https://adminswerk.de/archive/">Archive</a></li><li><a href="https://adminswerk.de/feed.xml">RSS</a></li>
+          <li><form method="get" id="search" action="https://duckduckgo.com/"><input type="hidden" name="sites" value="adminswerk.de">
+            <input type="hidden" name="kj" value="#3f3f3f"><input type="hidden" name="kx" value="b">
+            <input type="text" name="q" maxlength="200" placeholder="Search">
+            <input type="submit" value="DuckDuckGo Search" hidden="">
+          </form></li>
+        </ul>
+      </nav>
+    </header>
+    
+    
+    <article>
+      <header>
+        <h2><a href="https://adminswerk.de/multi-line-string-yaml-ansible-II/">Understanding multi line strings in YAML and Ansible (Part II - Ansible)</a></h2>
+        <div id="post_header_info"><time datetime="2018-04-16T00:00:00+00:00">Apr 16, 2018</time> • <span class="categorylisting">
+          
+            <a href="https://adminswerk.de/category/yaml/">YAML</a>,
+          
+            <a href="https://adminswerk.de/category/ansible/">Ansible</a>
+          
+          </span> • <a href="https://adminswerk.de/multi-line-string-yaml-ansible-II/#isso-thread" class="header_comment">5 Comments</a> 
+        </div>
+      </header>
+      <div>
+        <div class="adanchor">
+  <div class="adbox">
+    <h1 class="adcaption"><span class="adspan">Advertisement</span></h1>
+  <script async="" src="./Understanding multi line strings in YAML and Ansible (Part II - Ansible) › _dev_blog_ID10T_files/f.txt"></script>
+  <!-- id10t_top -->
+  <ins class="adsbygoogle gad_default" style="display:inline-block" data-ad-client="ca-pub-7586970907106458" data-ad-slot="1161208442"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+  </div>
+</div>
+
+        <p>In <a href="https://adminswerk.de/multi-line-string-yaml-ansible-I/">Part I</a> of this series we examined the two block styles
+of YAML, literal and folded, as well as the three block chomping methods, strip,
+clip and keep. In this post we want to investigate how these styles and methods
+interact with different Ansible use cases.</p>
+
+<h1 id="multi-line-strings-in-modules">Multi line strings in Modules</h1>
+<p>The classic usage of a multi line string in Ansible is in the <code class="language-plaintext highlighter-rouge">command</code> or <code class="language-plaintext highlighter-rouge">shell</code>
+module. This example is directly taken from the <a href="https://docs.ansible.com/ansible/latest/shell_module.html">Ansible docs</a>:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># You can use shell to run other executables to perform actions inline</span>
+<span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Run expect to wait for a successful PXE boot via out-of-band CIMC</span>
+  <span class="na">shell</span><span class="pi">:</span> <span class="pi">|</span>
+    <span class="s">set timeout 300</span>
+    <span class="s">spawn ssh admin@{{ cimc_host }}</span>
+
+    <span class="s">expect "password:"</span>
+    <span class="s">send "{{ cimc_password }}\n"</span>
+
+    <span class="s">expect "\n{{ cimc_name }}"</span>
+    <span class="s">send "connect host\n"</span>
+
+    <span class="s">expect "pxeboot.n12"</span>
+    <span class="s">send "\n"</span>
+
+    <span class="s">exit 0</span>
+  <span class="na">args</span><span class="pi">:</span>
+    <span class="na">executable</span><span class="pi">:</span> <span class="s">/usr/bin/expect</span>
+  <span class="na">delegate_to</span><span class="pi">:</span> <span class="s">localhost</span>
+</code></pre></div></div>
+
+<p>A literal style block with clip chomping is used to send several commands.
+Folded style would not make any sense here, except if you wanted to either pipe
+the commands or chain them with <code class="language-plaintext highlighter-rouge">&amp;&amp;</code> or <code class="language-plaintext highlighter-rouge">||</code>.</p>
+
+<!--more-->
+
+<div class="adanchor">
+  <div class="adbox">
+    <h1 class="adcaption"><span class="adspan">Advertisement</span></h1>
+  <script async="" src="./Understanding multi line strings in YAML and Ansible (Part II - Ansible) › _dev_blog_ID10T_files/f.txt"></script>
+  <!-- id10t_manual_insert -->
+  <ins class="adsbygoogle gad_default" style="display:inline-block" data-ad-client="ca-pub-7586970907106458" data-ad-slot="2423736840"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+  </div>
+</div>
+
+<p>One task I use in one of my server playbooks:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Get public IP</span>
+  <span class="na">shell</span><span class="pi">:</span> <span class="pi">&gt;</span>
+    <span class="s">bash -c "set -eo pipefail;</span>
+      <span class="s">[ -z "${PUBLIC_IP}" ]</span>
+      <span class="s">&amp;&amp; curl -s https://ipv4.wtfismyip.com/text</span>
+      <span class="s">| tr -d '\n'"</span>
+  <span class="na">register</span><span class="pi">:</span> <span class="s">node_public_ip</span>
+  <span class="na">changed_when</span><span class="pi">:</span> <span class="no">false</span>
+  <span class="na">failed_when</span><span class="pi">:</span> <span class="s">node_public_ip.rc &gt; </span><span class="m">0</span>
+  <span class="na">check_mode</span><span class="pi">:</span> <span class="s">no</span>
+</code></pre></div></div>
+
+<p>To ease the readability, I use folded style here. This enables me to do line breaks
+whenever I want without using "\".</p>
+
+<p>A similar approach for the <code class="language-plaintext highlighter-rouge">blockinfile</code> module:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">insert/update eth0 configuration stanza in /etc/network/interfaces</span>
+        <span class="s">(it might be better to copy files into /etc/network/interfaces.d/)</span>
+  <span class="na">blockinfile</span><span class="pi">:</span>
+    <span class="na">path</span><span class="pi">:</span> <span class="s">/etc/network/interfaces</span>
+    <span class="na">block</span><span class="pi">:</span> <span class="pi">|</span>
+      <span class="s">iface eth0 inet static</span>
+          <span class="s">address 192.0.2.23</span>
+          <span class="s">netmask 255.255.255.0</span>
+</code></pre></div></div>
+
+<p>Once again, literal style with clip chomping. Folded style would not make any
+sense at all, as it would reduce the block to one line.
+As in the other two examples, the different block folding methods would not
+change the functionality at all.</p>
+
+<h1 id="multi-line-strings-in-variables-and-loops">Multi line strings in variables and loops</h1>
+<p>Let’s start easy with these three example variables with a couple of lines
+from the Linux kernel <code class="language-plaintext highlighter-rouge">copyright</code> file:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">vars</span><span class="pi">:</span>
+  <span class="na">literal</span><span class="pi">:</span> <span class="pi">|</span>
+    <span class="s">This package is distributed in the hope that it will be useful,</span>
+    <span class="s">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+    <span class="s">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</span>
+  <span class="na">folded</span><span class="pi">:</span> <span class="pi">&gt;</span>
+    <span class="s">This package is distributed in the hope that it will be useful,</span>
+    <span class="s">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+    <span class="s">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</span>
+  <span class="na">folded_strip</span><span class="pi">:</span> <span class="pi">&gt;-</span>
+    <span class="s">This package is distributed in the hope that it will be useful,</span>
+    <span class="s">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+    <span class="s">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</span>
+</code></pre></div></div>
+
+<div class="adanchor">
+  <div class="adbox">
+    <h1 class="adcaption"><span class="adspan">Advertisement</span></h1>
+  <script async="" src="./Understanding multi line strings in YAML and Ansible (Part II - Ansible) › _dev_blog_ID10T_files/f.txt"></script>
+  <!-- id10t_manual_insert -->
+  <ins class="adsbygoogle gad_default" style="display:inline-block" data-ad-client="ca-pub-7586970907106458" data-ad-slot="2423736840"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+  </div>
+</div>
+
+<h2 id="shell">shell</h2>
+<p>Now let’s put these variable in a simple looped <code class="language-plaintext highlighter-rouge">shell</code> task. Just disregard the fact that
+you would probably never use this in a real playbook.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Ensure the file does not exist first</span>
+  <span class="na">file</span><span class="pi">:</span>
+    <span class="na">path</span><span class="pi">:</span> <span class="s">/tmp/mytemp</span>
+    <span class="na">state</span><span class="pi">:</span> <span class="s">absent</span>
+<span class="pi">-</span> <span class="na">shell</span><span class="pi">:</span> <span class="s2">"</span><span class="s">/bin/echo</span><span class="nv"> </span><span class="s">-en</span><span class="nv"> </span><span class="s">'##</span><span class="nv"> </span><span class="s">BEGIN</span><span class="nv"> </span><span class="s">##</span><span class="se">\n</span><span class="s">&gt;&gt;{{</span><span class="nv"> </span><span class="s">item</span><span class="nv"> </span><span class="s">}}&lt;&lt;</span><span class="se">\n</span><span class="s">##</span><span class="nv"> </span><span class="s">END</span><span class="nv"> </span><span class="s">##</span><span class="se">\n</span><span class="s">'</span><span class="nv"> </span><span class="s">&gt;&gt;</span><span class="nv"> </span><span class="s">/tmp/mytemp"</span>
+  <span class="na">with_items</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">literal</span><span class="nv"> </span><span class="s">}}"</span>
+    <span class="pi">-</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">folded</span><span class="nv"> </span><span class="s">}}"</span>
+    <span class="pi">-</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">folded_strip</span><span class="nv"> </span><span class="s">}}"</span>
+</code></pre></div></div>
+
+<p>Note that we use markers around each string, to ease the detection of the block
+end. If we now manually output the file, we can clearly see the differences:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat</span> /tmp/mytemp
+<span class="c">## BEGIN ##</span>
+<span class="o">&gt;&gt;</span>This package is distributed <span class="k">in </span>the hope that it will be useful,
+but WITHOUT ANY WARRANTY<span class="p">;</span> without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+&lt;&lt;
+<span class="c">## END ##</span>
+<span class="c">## BEGIN ##</span>
+<span class="o">&gt;&gt;</span>This package is distributed <span class="k">in </span>the hope that it will be useful, but WITHOUT ANY WARRANTY<span class="p">;</span> without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+&lt;&lt;
+<span class="c">## END ##</span>
+<span class="c">## BEGIN ##</span>
+<span class="o">&gt;&gt;</span>This package is distributed <span class="k">in </span>the hope that it will be useful, but WITHOUT ANY WARRANTY<span class="p">;</span> without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.&lt;&lt;
+<span class="c">## END ##</span>
+
+
+</code></pre></div></div>
+<p>It’s apparent that the line break behavior we learned about in the last post
+also applies to the blocks when looped.</p>
+
+<h2 id="blockinfile">blockinfile</h2>
+<p>Now, let’s use <code class="language-plaintext highlighter-rouge">blockinfile</code> with these vars:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Ensure the file does not exist first</span>
+  <span class="na">file</span><span class="pi">:</span>
+    <span class="na">path</span><span class="pi">:</span> <span class="s">/tmp/mytemp</span>
+    <span class="na">state</span><span class="pi">:</span> <span class="s">absent</span>
+<span class="pi">-</span> <span class="na">blockinfile</span><span class="pi">:</span>
+    <span class="na">path</span><span class="pi">:</span> <span class="s">/tmp/mytemp</span>
+    <span class="na">block</span><span class="pi">:</span> <span class="s2">"</span><span class="s">&gt;&gt;{{</span><span class="nv"> </span><span class="s">item.content</span><span class="nv"> </span><span class="s">}}&lt;&lt;"</span>
+    <span class="na">create</span><span class="pi">:</span> <span class="s">yes</span>
+    <span class="na">marker</span><span class="pi">:</span> <span class="s2">"</span><span class="s">##</span><span class="nv"> </span><span class="s">{mark}</span><span class="nv"> </span><span class="s">{{</span><span class="nv"> </span><span class="s">item.marker</span><span class="nv"> </span><span class="s">}}"</span>
+  <span class="na">with_items</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="pi">{</span><span class="s2">"</span><span class="s">content"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">literal</span><span class="nv"> </span><span class="s">}}"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">marker"</span><span class="pi">:</span> <span class="nv">1</span><span class="pi">}</span>
+    <span class="pi">-</span> <span class="pi">{</span><span class="s2">"</span><span class="s">content"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">folded</span><span class="nv"> </span><span class="s">}}"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">marker"</span><span class="pi">:</span> <span class="nv">2</span><span class="pi">}</span>
+    <span class="pi">-</span> <span class="pi">{</span><span class="s2">"</span><span class="s">content"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">folded_strip</span><span class="nv"> </span><span class="s">}}"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">marker"</span><span class="pi">:</span> <span class="nv">3</span><span class="pi">}</span>
+</code></pre></div></div>
+
+<p>The content is as expected:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat</span> /tmp/mytemp                     
+<span class="c">## BEGIN 1</span>
+<span class="o">&gt;&gt;</span>This package is distributed <span class="k">in </span>the hope that it will be useful,
+but WITHOUT ANY WARRANTY<span class="p">;</span> without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+&lt;&lt;
+<span class="c">## END 1</span>
+<span class="c">## BEGIN 2</span>
+<span class="o">&gt;&gt;</span>This package is distributed <span class="k">in </span>the hope that it will be useful, but WITHOUT ANY WARRANTY<span class="p">;</span> without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+&lt;&lt;
+<span class="c">## END 2</span>
+<span class="c">## BEGIN 3</span>
+<span class="o">&gt;&gt;</span>This package is distributed <span class="k">in </span>the hope that it will be useful, but WITHOUT ANY WARRANTY<span class="p">;</span> without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.&lt;&lt;
+<span class="c">## END 3</span>
+</code></pre></div></div>
+<p>No problems here, block styles as well as block chomping methods are respected.</p>
+
+<div class="adanchor">
+  <div class="adbox">
+    <h1 class="adcaption"><span class="adspan">Advertisement</span></h1>
+  <script async="" src="./Understanding multi line strings in YAML and Ansible (Part II - Ansible) › _dev_blog_ID10T_files/f.txt"></script>
+  <!-- id10t_manual_insert -->
+  <ins class="adsbygoogle gad_default" style="display:inline-block" data-ad-client="ca-pub-7586970907106458" data-ad-slot="2423736840"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+  </div>
+</div>
+
+<h2 id="lineinfile">lineinfile</h2>
+<p>So far, so good! Now let’s get to the hairy stuff. <code class="language-plaintext highlighter-rouge">lineinfile</code> for starters.
+While it’s not intuitive to use blocks in combination with <code class="language-plaintext highlighter-rouge">lineinfile</code> (that’s what
+<code class="language-plaintext highlighter-rouge">blockinfile</code> is for, duh!), <a href="https://docs.ansible.com/ansible/latest/YAMLSyntax.html#yaml-basics">Ansible’s documentation</a> implies that
+the folded style can be used to break long lines:</p>
+<blockquote>
+  <p>Values can span multiple lines using <code class="language-plaintext highlighter-rouge">|</code> or <code class="language-plaintext highlighter-rouge">&gt;</code>. Spanning multiple lines using
+a <code class="language-plaintext highlighter-rouge">|</code> will include the newlines. Using a <code class="language-plaintext highlighter-rouge">&gt;</code> will ignore newlines; <strong>it’s used to
+make what would otherwise be a very long line easier to read and edit.</strong> In either
+case the indentation will be ignored.</p>
+</blockquote>
+
+<p>Okay, let’s see! Here is our playbook:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">hosts</span><span class="pi">:</span> <span class="s">localhost</span>
+  <span class="na">gather_facts</span><span class="pi">:</span> <span class="s">no</span>
+  <span class="na">connection</span><span class="pi">:</span> <span class="s">local</span>
+  <span class="na">vars</span><span class="pi">:</span>
+    <span class="na">literal_line</span><span class="pi">:</span> <span class="pi">|</span>                               
+      <span class="s">I am a literal line                         </span>
+    <span class="na">folded_line</span><span class="pi">:</span> <span class="pi">&gt;</span>                                
+      <span class="s">I am a folded line                          </span>
+    <span class="na">folded_strip_line</span><span class="pi">:</span> <span class="pi">&gt;-</span>                         
+      <span class="s">I am a folded stripped line                 </span>
+<span class="na">tasks</span><span class="pi">:</span>                     
+<span class="pi">-</span> <span class="na">lineinfile</span><span class="pi">:</span>
+    <span class="na">path</span><span class="pi">:</span> <span class="s">/tmp/mylinetemp</span>                        
+    <span class="na">line</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">item</span><span class="nv"> </span><span class="s">}}"</span>                        
+    <span class="na">create</span><span class="pi">:</span> <span class="s">yes</span>                               
+  <span class="na">with_items</span><span class="pi">:</span>                                 
+    <span class="pi">-</span> <span class="s2">"</span><span class="s">{{literal_line}}"</span>                      
+    <span class="pi">-</span> <span class="s2">"</span><span class="s">{{folded_line}}"</span>                       
+    <span class="pi">-</span> <span class="s2">"</span><span class="s">{{folded_strip_line}}"</span>
+</code></pre></div></div>
+
+<p>And here is the content of <code class="language-plaintext highlighter-rouge">mylinetemp</code> after the first run:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat</span> /tmp/mytemp
+I am a literal line
+
+I am a folded line
+
+I am a folded stripped line
+
+</code></pre></div></div>
+<p>The first run didn’t cause any problems at all. How about a second run? This should
+not pose a problem due to idempotency, right? Here is the file content after run #2:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat</span> /tmp/mytemp
+I am a literal line
+
+I am a folded line
+
+I am a folded stripped line
+I am a literal line
+
+I am a folded line
+</code></pre></div></div>
+<p>The only line which is correctly detected is the folded stripped line. The other
+two lines will be added on every run. Why is that? The verbose output of Ansible
+gives the probable answer:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>TASK [lineinfile] ****************************************************************************************************************************************************************************************
+changed: [localhost] =&gt; (item=I am a literal line
+) =&gt; {"backup": "", "changed": true, "item": "I am a literal line\n", "msg": "line added"}
+changed: [localhost] =&gt; (item=I am a folded line
+) =&gt; {"backup": "", "changed": true, "item": "I am a folded line\n", "msg": "line added"}
+ok: [localhost] =&gt; (item=I am a folded stripped line) =&gt; {"backup": "", "changed": false, "item": "I am a folded stripped line", "msg": ""}
+</code></pre></div></div>
+<p>The line feed <code class="language-plaintext highlighter-rouge">\n</code> is still in the search string the <code class="language-plaintext highlighter-rouge">lineinfile</code> module searches
+for. If I am not mistaken, this poses a problem, as the line break is not part of the line itself but the delimiter due to Regex single line mode.</p>
+
+<h2 id="user">user</h2>
+<p>That’s already annoying at best, problematic at worst. But let’s not stop here. What about
+modules which “build” one line from various parameters, like <code class="language-plaintext highlighter-rouge">cron</code>, <code class="language-plaintext highlighter-rouge">mount</code> or -
+even more important - <code class="language-plaintext highlighter-rouge">user</code> or <code class="language-plaintext highlighter-rouge">group</code>?</p>
+
+<p>It’s…unintuitive. We’ll only use folded style here, as it’s safe to use
+according to the Ansible documentation. Literal style could expectedly break
+stuff.</p>
+
+<p>First of all the good news, my tests with the <code class="language-plaintext highlighter-rouge">user</code> module were unsuccessful.
+I always got an error:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">hosts</span><span class="pi">:</span> <span class="s">localhost</span>
+  <span class="na">connection</span><span class="pi">:</span> <span class="s">local</span>
+  <span class="na">vars</span><span class="pi">:</span>
+    <span class="na">users</span><span class="pi">:</span>                                        
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">user1</span>                               
+        <span class="na">comment</span><span class="pi">:</span> <span class="pi">&gt;</span>                                
+          <span class="s">A very long comment, just because the user is so very important                            </span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">user2</span>                               
+        <span class="na">comment</span><span class="pi">:</span> <span class="s">A moderately long comment</span>     
+    <span class="na">tasks</span><span class="pi">:</span>              
+      <span class="pi">-</span> <span class="na">user</span><span class="pi">:</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">item.name</span><span class="nv"> </span><span class="s">}}"</span>
+          <span class="na">comment</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">item.comment</span><span class="nv"> </span><span class="s">}}"</span>
+          <span class="na">createhome</span><span class="pi">:</span> <span class="s">no</span>
+        <span class="na">with_items</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">users</span><span class="nv"> </span><span class="s">}}"</span>
+</code></pre></div></div>
+
+<p>Output:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>TASK [user] **********************************************************************************************************************************************************************************************
+failed: [localhost] (item={u'comment': u'A very long comment, just because the user is so very important\n', u'name': u'user1'}) =&gt; {"changed": false, "item": {"comment": "A very long comment, just because the user is so very important\n", "name": "user1"}, "msg": "useradd: invalid comment 'A very long comment, just because the user is so very important\n'\n", "name": "user1", "rc": 3}
+ok: [localhost] =&gt; (item={u'comment': u'A moderately long comment', u'name': u'user2'}) =&gt; {"append": false, "changed": false, "comment": "A moderately long comment", "group": 1001, "home": "/home/user2", "item": {"comment": "A moderately long comment", "name": "user2"}, "move_home": false, "name": "user2", "shell": "", "state": "present", "uid": 1001}
+
+PLAY RECAP ***********************************************************************************************************************************************************************************************
+</code></pre></div></div>
+<p>The <code class="language-plaintext highlighter-rouge">user</code> module uses the shell user management commands, <code class="language-plaintext highlighter-rouge">useradd</code> in this case.
+As we can see in the <code class="language-plaintext highlighter-rouge">msg</code> field, it’s <code class="language-plaintext highlighter-rouge">useradd</code> which complains about an invalid
+comment. Therefore it’s very unlikely you could bork your <code class="language-plaintext highlighter-rouge">/etc/passwd</code> when using
+a block with a line feed at the end.</p>
+
+<div class="adanchor">
+  <div class="adbox">
+    <h1 class="adcaption"><span class="adspan">Advertisement</span></h1>
+  <script async="" src="./Understanding multi line strings in YAML and Ansible (Part II - Ansible) › _dev_blog_ID10T_files/f.txt"></script>
+  <!-- id10t_manual_insert -->
+  <ins class="adsbygoogle gad_default" style="display:inline-block" data-ad-client="ca-pub-7586970907106458" data-ad-slot="2423736840"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+  </div>
+</div>
+
+<h2 id="cron">cron</h2>
+<p>The <code class="language-plaintext highlighter-rouge">cron</code> module is where the problems start:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">hosts</span><span class="pi">:</span> <span class="s">localhost</span>
+  <span class="na">connection</span><span class="pi">:</span> <span class="s">local</span>
+  <span class="na">vars</span><span class="pi">:</span>
+   <span class="na">cronjobs</span><span class="pi">:</span>                                     
+     <span class="pi">-</span> <span class="na">command</span><span class="pi">:</span> <span class="pi">&gt;</span>                                
+         <span class="s">/bin/echo "Will all of this long stuff</span>
+         <span class="s">be on one line? Hm... I wonder."</span>
+       <span class="na">name</span><span class="pi">:</span> <span class="pi">&gt;</span>
+         <span class="s">A long line job with a very long line description.</span>
+         <span class="s">It is very important to document your cron jobs.</span>
+     <span class="pi">-</span> <span class="na">command</span><span class="pi">:</span> <span class="s">/bin/echo "This is on one line 4 sure"</span>                                              
+       <span class="na">name</span><span class="pi">:</span> <span class="s">A short line job</span>                     
+  <span class="na">tasks</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">cron</span><span class="pi">:</span>                                       
+        <span class="na">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">item.name</span><span class="nv"> </span><span class="s">}}"</span>                   
+        <span class="na">cron_file</span><span class="pi">:</span> <span class="s">/tmp/mytempcron</span>                
+        <span class="na">job</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">item.command</span><span class="nv"> </span><span class="s">}}"</span>                 
+        <span class="na">user</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">ansible_user_id</span><span class="nv"> </span><span class="s">}}"</span>             
+      <span class="na">with_items</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">cronjobs</span><span class="nv"> </span><span class="s">}}"</span>
+</code></pre></div></div>
+
+<p>The output of the first run is only mildly annoying:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat</span> /tmp/mytempcron
+<span class="c">#Ansible: A long line job with a very long line description. It is very important to document your cron jobs.                                                                                             </span>
+
+<span class="k">*</span> <span class="k">*</span> <span class="k">*</span> <span class="k">*</span> <span class="k">*</span> m3adow /bin/echo <span class="s2">"Will all of this long stuff be on one line? Hm... I wonder."</span>             
+<span class="c">#Ansible: A short line job                        </span>
+<span class="k">*</span> <span class="k">*</span> <span class="k">*</span> <span class="k">*</span> <span class="k">*</span> m3adow /bin/echo <span class="s2">"This is on one line 4 sure"</span>
+</code></pre></div></div>
+<p>Apart from the empty line (due to the <code class="language-plaintext highlighter-rouge">\n</code> in the name variable) between the
+Ansible marker and the command, everything seems to be okay. The second run however
+reveals the problem:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat</span> /tmp/mytempcron
+<span class="c">#Ansible: A long line job with a very long line description. It is very important to document your cron jobs.                                                                                             </span>
+
+<span class="c">#Ansible: A long line job with a very long line description. It is very important to document your cron jobs.                                                                                             </span>
+
+<span class="k">*</span> <span class="k">*</span> <span class="k">*</span> <span class="k">*</span> <span class="k">*</span> m3adow /bin/echo <span class="s2">"Will all of this long stuff be on one line? Hm... I wonder."</span>             
+<span class="c">#Ansible: A short line job                        </span>
+<span class="k">*</span> <span class="k">*</span> <span class="k">*</span> <span class="k">*</span> <span class="k">*</span> m3adow /bin/echo <span class="s2">"This is on one line 4 sure"</span>
+</code></pre></div></div>
+<p>While the command is still luckily only used once, an additional marker comment was added.
+Of course every playbook run will add a new marker comment. So no idempotency,
+a bit of file growth per run, but no functional errors. I’d call this an annoyance,
+perhaps a small problem but nothing more.</p>
+
+<h2 id="mount">mount</h2>
+
+<p>Talking about functional errors, let’s look into the <code class="language-plaintext highlighter-rouge">mount</code> module of Ansible:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">hosts</span><span class="pi">:</span> <span class="s">localhost</span>
+  <span class="na">connection</span><span class="pi">:</span> <span class="s">local</span>
+  <span class="na">vars</span><span class="pi">:</span>
+    <span class="na">mounts</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">src</span><span class="pi">:</span> <span class="s">m3adow@sshfs_server:/home/m3adow/</span>
+        <span class="na">path</span><span class="pi">:</span> <span class="s">/tmp/tempmnt1</span>
+        <span class="na">fstype</span><span class="pi">:</span> <span class="s">fuse.sshfs</span>
+        <span class="na">mount_options</span><span class="pi">:</span> <span class="pi">&gt;</span>
+          <span class="s">noauto,x-systemd.automount,x-systemd.idle-timeout=60,_netdev,users,</span>
+          <span class="s">idmap=user,transform_symlinks,follow_symlinks,default_permissions,</span>
+          <span class="s">allow_root,IdentityFile=/root/.ssh/ssh_key,reconnect,gid=0</span>
+      <span class="pi">-</span> <span class="na">src</span><span class="pi">:</span> <span class="s">/dev/sda1</span>
+        <span class="na">path</span><span class="pi">:</span> <span class="s">/tmp/tempmnt2</span>
+        <span class="na">fstype</span><span class="pi">:</span> <span class="s">ext4</span>
+        <span class="na">mount_options</span><span class="pi">:</span> <span class="s">defaults</span>
+  <span class="na">tasks</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">mount</span><span class="pi">:</span>
+        <span class="na">fstab</span><span class="pi">:</span> <span class="s">/tmp/mytempfstab</span>
+        <span class="na">src</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">item.src</span><span class="nv"> </span><span class="s">}}"</span>
+        <span class="na">path</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">item.path</span><span class="nv"> </span><span class="s">}}"</span>
+        <span class="na">opts</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">item.mount_options</span><span class="nv"> </span><span class="s">}}"</span>
+        <span class="na">fstype</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">item.fstype</span><span class="nv"> </span><span class="s">}}"</span>
+        <span class="na">state</span><span class="pi">:</span> <span class="s">present</span>
+      <span class="na">with_items</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">mounts</span><span class="nv"> </span><span class="s">}}"</span>
+</code></pre></div></div>
+
+<p>And here is the content of the <code class="language-plaintext highlighter-rouge">/tmp/mytempfstab</code>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat</span> /tmp/mytempfstab
+m3adow@sshfs_server:/home/m3adow/ /tmp/tempmnt1 fuse.sshfs noauto,x-systemd.automount,x-systemd.idle-timeout<span class="o">=</span>60,_netdev,users,<span class="se">\0</span><span class="nv">40idmap</span><span class="o">=</span>user,transform_symlinks,follow_symlinks,default_permissions,<span class="se">\0</span>40allow_root,IdentityFile<span class="o">=</span>/root/.ssh/ssh_key,reconnect,gid<span class="o">=</span>0
+ 0 0
+/dev/sda1 /tmp/tempmnt2 ext4 defaults 0 0
+</code></pre></div></div>
+
+<p>Whoopsie! That’s not how a fstab entry is supposed to look! This was my initial
+problem, that’s why I even started to look into block styles and chomping methods.
+Of course we already know why this happens. The folded style still contains a line
+feed at the end, resulting in the line break after the mount options / before the
+dump setting. Additionally, there are also spaces (<code class="language-plaintext highlighter-rouge">\040</code>) where the line breaks in
+the block were rendering.
+Rerunning the playbook has similar effects to <code class="language-plaintext highlighter-rouge">cron</code>:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat</span> /tmp/mytempfstab
+m3adow@sshfs_server:/home/m3adow/ /tmp/tempmnt1 fuse.sshfs noauto,x-systemd.automount,x-systemd.idle-timeout<span class="o">=</span>60,_netdev,users,<span class="se">\0</span><span class="nv">40idmap</span><span class="o">=</span>user,transform_symlinks,follow_symlinks,default_permissions,<span class="se">\0</span>40allow_root,IdentityFile<span class="o">=</span>/root/.ssh/ssh_key,reconnect,gid<span class="o">=</span>0
+ 0 0
+/dev/sda1 /tmp/tempmnt2 ext4 defaults 0 0
+m3adow@sshfs_server:/home/m3adow/ /tmp/tempmnt1 fuse.sshfs noauto,x-systemd.automount,x-systemd.idle-timeout<span class="o">=</span>60,_netdev,users,<span class="se">\0</span><span class="nv">40idmap</span><span class="o">=</span>user,transform_symlinks,follow_symlinks,default_permissions,<span class="se">\0</span>40allow_root,IdentityFile<span class="o">=</span>/root/.ssh/ssh_key,reconnect,gid<span class="o">=</span>0
+ 0 0
+</code></pre></div></div>
+
+<p>We now have two non functional fstab entries. This will lead to errors when mounting
+and booting. Of course one misformatted entry is added every time you run the
+playbook.</p>
+
+<div class="adanchor">
+  <div class="adbox">
+    <h1 class="adcaption"><span class="adspan">Advertisement</span></h1>
+  <script async="" src="./Understanding multi line strings in YAML and Ansible (Part II - Ansible) › _dev_blog_ID10T_files/f.txt"></script>
+  <!-- id10t_manual_insert -->
+  <ins class="adsbygoogle gad_default" style="display:inline-block" data-ad-client="ca-pub-7586970907106458" data-ad-slot="2423736840"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+  </div>
+</div>
+
+<h1 id="solution">Solution</h1>
+
+<p>We have examined the behavior of blocks in Ansible exhaustively and we have also
+found out the quirks and problems we could encounter. Now let’s see how we could
+circumvent said problems.</p>
+
+<h2 id="trim">trim</h2>
+<p>If you only need to get rid of the trailing white spaces, use the Jinja2 <code class="language-plaintext highlighter-rouge">trim()</code>
+filter. This would solve our problem with the <code class="language-plaintext highlighter-rouge">cron</code> module in the playbook above:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">tasks</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">cron</span><span class="pi">:</span>                                       
+      <span class="na">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">item.name</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">trim()}}"</span>                   
+      <span class="na">cron_file</span><span class="pi">:</span> <span class="s">/tmp/mytempcron</span>                
+      <span class="na">job</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">item.command</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">trim()</span><span class="nv"> </span><span class="s">}}"</span>                 
+      <span class="na">user</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">ansible_user_id</span><span class="nv"> </span><span class="s">}}"</span>             
+    <span class="na">with_items</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">cronjobs</span><span class="nv"> </span><span class="s">}}"</span>
+</code></pre></div></div>
+
+<p>Output:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat</span> /tmp/mytempcron
+<span class="c">#Ansible: A long line job with a very long line description. It is very important to document your cron jobs.</span>
+<span class="k">*</span> <span class="k">*</span> <span class="k">*</span> <span class="k">*</span> <span class="k">*</span> m3adow /bin/echo <span class="s2">"Will all of this long stuff be on one line? Hm... I wonder."</span>
+<span class="c">#Ansible: A short line job</span>
+<span class="k">*</span> <span class="k">*</span> <span class="k">*</span> <span class="k">*</span> <span class="k">*</span> m3adow /bin/echo <span class="s2">"This is on one line 4 sure"</span>
+</code></pre></div></div>
+<p>No line feeds in the name or in the command, also full idempotency, following runs
+of the playbook will properly detect the existing cron entries and therefore not
+change anything.</p>
+
+<h2 id="regex_replace">regex_replace</h2>
+<p>Using <code class="language-plaintext highlighter-rouge">trim</code> does not solve our problem with <code class="language-plaintext highlighter-rouge">mount</code>. While the trailing line break
+would be removed, the spaces in the <code class="language-plaintext highlighter-rouge">mount_options</code> variable would remain. It
+seems we need stronger weapons for this to work. The only reliable solution I
+could find is the Jinja2 <code class="language-plaintext highlighter-rouge">regex_replace</code> filter available since Ansible 2.2.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">tasks</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">mount</span><span class="pi">:</span>
+      <span class="na">fstab</span><span class="pi">:</span> <span class="s">/tmp/mytempfstab</span>
+      <span class="na">src</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">item.src</span><span class="nv"> </span><span class="s">}}"</span>
+      <span class="na">path</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">item.path</span><span class="nv"> </span><span class="s">}}"</span>
+      <span class="na">opts</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">item.mount_options</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">regex_replace('</span><span class="se">\\</span><span class="s">s','')}}"</span>
+      <span class="na">fstype</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">item.fstype</span><span class="nv"> </span><span class="s">}}"</span>
+      <span class="na">state</span><span class="pi">:</span> <span class="s">present</span>
+    <span class="na">with_items</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">mounts</span><span class="nv"> </span><span class="s">}}"</span>
+</code></pre></div></div>
+
+<p>This does the job:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat</span> /tmp/mytempfstab
+m3adow@sshfs_server:/home/m3adow/ /tmp/tempmnt1 fuse.sshfs noauto,x-systemd.automount,x-systemd.idle-timeout<span class="o">=</span>60,_netdev,users,idmap<span class="o">=</span>user,transform_symlinks,follow_symlinks,default_permissions,allow_root,IdentityFile<span class="o">=</span>/root/.ssh/ssh_key,reconnect,gid<span class="o">=</span>0 0 0
+/dev/sda1 /tmp/tempmnt2 ext4 defaults 0 0
+</code></pre></div></div>
+<p>No line feed before the setting, no <code class="language-plaintext highlighter-rouge">\040</code> within the mount options. Future
+runs of the task will find this line to be <code class="language-plaintext highlighter-rouge">ok</code> and will not change anything.
+Mission accomplished! It is not very intuitive, but it gets the job done.</p>
+
+<h1 id="summary">Summary</h1>
+
+<p>In this post we have learned about the behavior of blocks when used in modules
+and - more importantly - when used in variables. We have seen that the Ansible
+documentation is misleading at best, plainly wrong at worst. We have also learned
+that using blocks in variables doesn’t play nicely with some modules, <code class="language-plaintext highlighter-rouge">cron</code>, <code class="language-plaintext highlighter-rouge">lineinfile</code>
+and especially <code class="language-plaintext highlighter-rouge">mount</code> in our case studies here. I also presented two solutions
+to some problematic use cases.<br>
+For me, it is obvious this property of YAML needs more documentation in Ansible,
+as of now it is handled sloppily. I would not recommend using block styles in variables
+to ease readability as it could have unforseen consequences.</p>
+
+<p>I hope I could teach you something and would be glad to hear your experiences. Of
+course, feel also free to criticise this blog post in the comments.</p>
+
+
+        
+        <div class="adanchor">
+  <div class="adbox">
+    <h1 class="adcaption"><span class="adspan">Advertisement</span></h1>
+  <script async="" src="./Understanding multi line strings in YAML and Ansible (Part II - Ansible) › _dev_blog_ID10T_files/f.txt"></script>
+  <!-- id10t_bottom -->
+  <ins class="adsbygoogle gad_default" style="display:inline-block" data-ad-client="ca-pub-7586970907106458" data-ad-slot="8405273641"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+  </div>
+</div>
+        
+          <div class="related">
+            <b>Related Posts</b>
+            <ul>
+              
+              
+                   
+                       
+                
+                  
+                  
+                
+                  
+                    
+                    <li><a href="https://adminswerk.de/multi-line-string-yaml-ansible-I/">Understanding multi line strings in YAML and Ansible (Part I - YAML)</a></li>
+                  
+                  
+                
+                
+                       
+                
+                  
+                    
+                    <li><a href="https://adminswerk.de/ansible-variable-python-string-substitution/">Ansible: Using Python string substituition in variables</a></li>
+                  
+                  
+                
+                  
+                    
+                    <li><a href="https://adminswerk.de/ansible-programatic-variables/">Ansible: Using programatically constructed variables</a></li>
+                  
+                  
+                    
+                
+                  
+              
+            </ul>
+          </div>
+      </div>
+        
+        <div id="isso-thread"><h4>5 Comments</h4><div class="isso-postbox"><div class="form-wrapper"><div class="textarea-wrapper"><div contenteditable="true" class="textarea placeholder">Type Comment Here (at least 3 chars)</div><div class="preview"><div class="isso-comment"><div class="text-wrapper"><div class="text"></div></div></div></div></div><section class="auth-section"><p class="input-wrapper"><input type="text" name="author" placeholder="Name (optional)" value=""></p><p class="input-wrapper"><input type="email" name="email" placeholder="E-mail (optional)" value=""></p><p class="input-wrapper"><input type="text" name="website" placeholder="Website (optional)" value=""></p><p class="post-action"><input type="submit" value="Submit"></p><p class="post-action"><input type="button" name="preview" value="Preview"></p><p class="post-action"><input type="button" name="edit" value="Edit"></p></section><section class="notification-section" style="display: none;"><label><input type="checkbox" name="notification">Subscribe to email notification of replies</label></section></div></div><div id="isso-root"><div id="isso-367" class="isso-comment isso-no-votes"><div class="avatar"><svg version="1.1" viewBox="0 0 48 48" preserveAspectRatio="xMinYMin meet" shape-rendering="crispEdges" data-hash="720912e93a99"><rect x="0" y="0" width="56" height="56" style="fill: #f0f0f0"></rect><rect x="4" y="12" width="8" height="8" style="fill: #5698c4"></rect><rect x="36" y="12" width="8" height="8" style="fill: #5698c4"></rect><rect x="4" y="36" width="8" height="8" style="fill: #5698c4"></rect><rect x="36" y="36" width="8" height="8" style="fill: #5698c4"></rect><rect x="12" y="4" width="8" height="8" style="fill: #5698c4"></rect><rect x="28" y="4" width="8" height="8" style="fill: #5698c4"></rect><rect x="12" y="12" width="8" height="8" style="fill: #5698c4"></rect><rect x="28" y="12" width="8" height="8" style="fill: #5698c4"></rect><rect x="12" y="28" width="8" height="8" style="fill: #5698c4"></rect><rect x="28" y="28" width="8" height="8" style="fill: #5698c4"></rect><rect x="20" y="4" width="8" height="8" style="fill: #5698c4"></rect><rect x="20" y="28" width="8" height="8" style="fill: #5698c4"></rect><rect x="20" y="36" width="8" height="8" style="fill: #5698c4"></rect></svg></div><div class="text-wrapper"><div role="meta" class="isso-comment-header"><span class="author">Anonymous</span><span class="spacer">•</span><a href="https://adminswerk.de/multi-line-string-yaml-ansible-II/#isso-367" class="permalink"><time title="Tue May 07 2019 22:25:09 GMT+0530 (India Standard Time)" datetime="2019-04-02T16:55:09Z">last year</time></a><span class="note"></span></div><div class="text"><p>Great to read an article on the ansible fundamentals and solutions for them. I wish you would write more articles on this kind of things.</p></div><div class="isso-comment-footer"><span class="votes">0</span><a href="https://adminswerk.de/multi-line-string-yaml-ansible-II/#" class="upvote"><!-- Generator: IcoMoon.io --><svg width="16" height="16" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="gray">
+  <g>
+    <path d="M 24.773,18.299c-0.651-0.669-7.512-7.203-7.512-7.203C 16.912,10.739, 16.456,10.56, 16,10.56c-0.458,0-0.914,0.179-1.261,0.536 c0,0-6.861,6.534-7.514,7.203c-0.651,0.669-0.696,1.872,0,2.586c 0.698,0.712, 1.669,0.77, 2.522,0L 16,14.89l 6.251,5.995 c 0.854,0.77, 1.827,0.712, 2.522,0C 25.47,20.17, 25.427,18.966, 24.773,18.299z">
+    </path>
+  </g>
+</svg>
+</a><span class="spacer">|</span><a href="https://adminswerk.de/multi-line-string-yaml-ansible-II/#" class="downvote"><!-- Generator: IcoMoon.io --><svg width="16" height="16" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="gray">
+  <g>
+    <path d="M 24.773,13.701c-0.651,0.669-7.512,7.205-7.512,7.205C 16.912,21.262, 16.456,21.44, 16,21.44c-0.458,0-0.914-0.178-1.261-0.534 c0,0-6.861-6.536-7.514-7.205c-0.651-0.669-0.696-1.87,0-2.586c 0.698-0.714, 1.669-0.77, 2.522,0L 16,17.112l 6.251-5.995 c 0.854-0.77, 1.827-0.714, 2.522,0C 25.47,11.83, 25.427,13.034, 24.773,13.701z">
+    </path>
+  </g>
+</svg>
+</a><a href="https://adminswerk.de/multi-line-string-yaml-ansible-II/#" class="reply">Reply</a></div><div class="isso-follow-up"></div></div></div><div id="isso-403" class="isso-comment isso-no-votes"><div class="avatar"><svg version="1.1" viewBox="0 0 48 48" preserveAspectRatio="xMinYMin meet" shape-rendering="crispEdges" data-hash="7836310df725"><rect x="0" y="0" width="56" height="56" style="fill: #f0f0f0"></rect><rect x="4" y="12" width="8" height="8" style="fill: #f19670"></rect><rect x="36" y="12" width="8" height="8" style="fill: #f19670"></rect><rect x="4" y="20" width="8" height="8" style="fill: #f19670"></rect><rect x="36" y="20" width="8" height="8" style="fill: #f19670"></rect><rect x="4" y="28" width="8" height="8" style="fill: #f19670"></rect><rect x="36" y="28" width="8" height="8" style="fill: #f19670"></rect><rect x="4" y="36" width="8" height="8" style="fill: #f19670"></rect><rect x="36" y="36" width="8" height="8" style="fill: #f19670"></rect><rect x="12" y="4" width="8" height="8" style="fill: #f19670"></rect><rect x="28" y="4" width="8" height="8" style="fill: #f19670"></rect><rect x="12" y="20" width="8" height="8" style="fill: #f19670"></rect><rect x="28" y="20" width="8" height="8" style="fill: #f19670"></rect><rect x="12" y="28" width="8" height="8" style="fill: #f19670"></rect><rect x="28" y="28" width="8" height="8" style="fill: #f19670"></rect><rect x="12" y="36" width="8" height="8" style="fill: #f19670"></rect><rect x="28" y="36" width="8" height="8" style="fill: #f19670"></rect><rect x="20" y="20" width="8" height="8" style="fill: #f19670"></rect></svg></div><div class="text-wrapper"><div role="meta" class="isso-comment-header"><span class="author">Anonymous</span><span class="spacer">•</span><a href="https://adminswerk.de/multi-line-string-yaml-ansible-II/#isso-403" class="permalink"><time title="Sat Mar 14 2020 23:32:38 GMT+0530 (India Standard Time)" datetime="2020-02-06T18:02:38Z">8 months ago</time></a><span class="note"></span></div><div class="text"><p>Please check code. Nothing inside quotes "" in tasks.</p></div><div class="isso-comment-footer"><span class="votes">0</span><a href="https://adminswerk.de/multi-line-string-yaml-ansible-II/#" class="upvote"><!-- Generator: IcoMoon.io --><svg width="16" height="16" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="gray">
+  <g>
+    <path d="M 24.773,18.299c-0.651-0.669-7.512-7.203-7.512-7.203C 16.912,10.739, 16.456,10.56, 16,10.56c-0.458,0-0.914,0.179-1.261,0.536 c0,0-6.861,6.534-7.514,7.203c-0.651,0.669-0.696,1.872,0,2.586c 0.698,0.712, 1.669,0.77, 2.522,0L 16,14.89l 6.251,5.995 c 0.854,0.77, 1.827,0.712, 2.522,0C 25.47,20.17, 25.427,18.966, 24.773,18.299z">
+    </path>
+  </g>
+</svg>
+</a><span class="spacer">|</span><a href="https://adminswerk.de/multi-line-string-yaml-ansible-II/#" class="downvote"><!-- Generator: IcoMoon.io --><svg width="16" height="16" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="gray">
+  <g>
+    <path d="M 24.773,13.701c-0.651,0.669-7.512,7.205-7.512,7.205C 16.912,21.262, 16.456,21.44, 16,21.44c-0.458,0-0.914-0.178-1.261-0.534 c0,0-6.861-6.536-7.514-7.205c-0.651-0.669-0.696-1.87,0-2.586c 0.698-0.714, 1.669-0.77, 2.522,0L 16,17.112l 6.251-5.995 c 0.854-0.77, 1.827-0.714, 2.522,0C 25.47,11.83, 25.427,13.034, 24.773,13.701z">
+    </path>
+  </g>
+</svg>
+</a><a href="https://adminswerk.de/multi-line-string-yaml-ansible-II/#" class="reply">Reply</a></div><div class="isso-follow-up"><div id="isso-405" class="isso-comment isso-no-votes"><div class="avatar"><svg version="1.1" viewBox="0 0 48 48" preserveAspectRatio="xMinYMin meet" shape-rendering="crispEdges" data-hash="dc32922e6ebc"><rect x="0" y="0" width="56" height="56" style="fill: #f0f0f0"></rect><rect x="4" y="4" width="8" height="8" style="fill: #be5168"></rect><rect x="36" y="4" width="8" height="8" style="fill: #be5168"></rect><rect x="4" y="28" width="8" height="8" style="fill: #be5168"></rect><rect x="36" y="28" width="8" height="8" style="fill: #be5168"></rect><rect x="4" y="36" width="8" height="8" style="fill: #be5168"></rect><rect x="36" y="36" width="8" height="8" style="fill: #be5168"></rect><rect x="12" y="12" width="8" height="8" style="fill: #be5168"></rect><rect x="28" y="12" width="8" height="8" style="fill: #be5168"></rect><rect x="12" y="20" width="8" height="8" style="fill: #be5168"></rect><rect x="28" y="20" width="8" height="8" style="fill: #be5168"></rect><rect x="12" y="28" width="8" height="8" style="fill: #be5168"></rect><rect x="28" y="28" width="8" height="8" style="fill: #be5168"></rect><rect x="20" y="4" width="8" height="8" style="fill: #be5168"></rect><rect x="20" y="20" width="8" height="8" style="fill: #be5168"></rect><rect x="20" y="28" width="8" height="8" style="fill: #be5168"></rect><rect x="20" y="36" width="8" height="8" style="fill: #be5168"></rect></svg></div><div class="text-wrapper"><div role="meta" class="isso-comment-header"><a href="https://adminswerk.de/" rel="nofollow" class="author">m3adow</a><span class="spacer">•</span><a href="https://adminswerk.de/multi-line-string-yaml-ansible-II/#isso-405" class="permalink"><time title="Mon Mar 16 2020 14:26:40 GMT+0530 (India Standard Time)" datetime="2020-02-01T08:56:40Z">8 months ago</time></a><span class="note"></span></div><div class="text"><p>Hey, thanks for the notice. I forgot to add 'raw'-tags to some code excerpts. I hope I fixed all of them now.</p></div><div class="isso-comment-footer"><span class="votes">0</span><a href="https://adminswerk.de/multi-line-string-yaml-ansible-II/#" class="upvote"><!-- Generator: IcoMoon.io --><svg width="16" height="16" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="gray">
+  <g>
+    <path d="M 24.773,18.299c-0.651-0.669-7.512-7.203-7.512-7.203C 16.912,10.739, 16.456,10.56, 16,10.56c-0.458,0-0.914,0.179-1.261,0.536 c0,0-6.861,6.534-7.514,7.203c-0.651,0.669-0.696,1.872,0,2.586c 0.698,0.712, 1.669,0.77, 2.522,0L 16,14.89l 6.251,5.995 c 0.854,0.77, 1.827,0.712, 2.522,0C 25.47,20.17, 25.427,18.966, 24.773,18.299z">
+    </path>
+  </g>
+</svg>
+</a><span class="spacer">|</span><a href="https://adminswerk.de/multi-line-string-yaml-ansible-II/#" class="downvote"><!-- Generator: IcoMoon.io --><svg width="16" height="16" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="gray">
+  <g>
+    <path d="M 24.773,13.701c-0.651,0.669-7.512,7.205-7.512,7.205C 16.912,21.262, 16.456,21.44, 16,21.44c-0.458,0-0.914-0.178-1.261-0.534 c0,0-6.861-6.536-7.514-7.205c-0.651-0.669-0.696-1.87,0-2.586c 0.698-0.714, 1.669-0.77, 2.522,0L 16,17.112l 6.251-5.995 c 0.854-0.77, 1.827-0.714, 2.522,0C 25.47,11.83, 25.427,13.034, 24.773,13.701z">
+    </path>
+  </g>
+</svg>
+</a><a href="https://adminswerk.de/multi-line-string-yaml-ansible-II/#" class="reply">Reply</a></div><div class="isso-follow-up"></div></div></div></div></div></div><div id="isso-404" class="isso-comment isso-no-votes"><div class="avatar"><svg version="1.1" viewBox="0 0 48 48" preserveAspectRatio="xMinYMin meet" shape-rendering="crispEdges" data-hash="7836310df725"><rect x="0" y="0" width="56" height="56" style="fill: #f0f0f0"></rect><rect x="4" y="12" width="8" height="8" style="fill: #f19670"></rect><rect x="36" y="12" width="8" height="8" style="fill: #f19670"></rect><rect x="4" y="20" width="8" height="8" style="fill: #f19670"></rect><rect x="36" y="20" width="8" height="8" style="fill: #f19670"></rect><rect x="4" y="28" width="8" height="8" style="fill: #f19670"></rect><rect x="36" y="28" width="8" height="8" style="fill: #f19670"></rect><rect x="4" y="36" width="8" height="8" style="fill: #f19670"></rect><rect x="36" y="36" width="8" height="8" style="fill: #f19670"></rect><rect x="12" y="4" width="8" height="8" style="fill: #f19670"></rect><rect x="28" y="4" width="8" height="8" style="fill: #f19670"></rect><rect x="12" y="20" width="8" height="8" style="fill: #f19670"></rect><rect x="28" y="20" width="8" height="8" style="fill: #f19670"></rect><rect x="12" y="28" width="8" height="8" style="fill: #f19670"></rect><rect x="28" y="28" width="8" height="8" style="fill: #f19670"></rect><rect x="12" y="36" width="8" height="8" style="fill: #f19670"></rect><rect x="28" y="36" width="8" height="8" style="fill: #f19670"></rect><rect x="20" y="20" width="8" height="8" style="fill: #f19670"></rect></svg></div><div class="text-wrapper"><div role="meta" class="isso-comment-header"><span class="author">Anonymous</span><span class="spacer">•</span><a href="https://adminswerk.de/multi-line-string-yaml-ansible-II/#isso-404" class="permalink"><time title="Sat Mar 14 2020 23:49:13 GMT+0530 (India Standard Time)" datetime="2020-02-06T18:19:13Z">8 months ago</time></a><span class="note"></span></div><div class="text"><p>Can we use &gt;- instead of trim? Did you test long variable with yum module (many comma separated package names for name section)?</p></div><div class="isso-comment-footer"><span class="votes">0</span><a href="https://adminswerk.de/multi-line-string-yaml-ansible-II/#" class="upvote"><!-- Generator: IcoMoon.io --><svg width="16" height="16" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="gray">
+  <g>
+    <path d="M 24.773,18.299c-0.651-0.669-7.512-7.203-7.512-7.203C 16.912,10.739, 16.456,10.56, 16,10.56c-0.458,0-0.914,0.179-1.261,0.536 c0,0-6.861,6.534-7.514,7.203c-0.651,0.669-0.696,1.872,0,2.586c 0.698,0.712, 1.669,0.77, 2.522,0L 16,14.89l 6.251,5.995 c 0.854,0.77, 1.827,0.712, 2.522,0C 25.47,20.17, 25.427,18.966, 24.773,18.299z">
+    </path>
+  </g>
+</svg>
+</a><span class="spacer">|</span><a href="https://adminswerk.de/multi-line-string-yaml-ansible-II/#" class="downvote"><!-- Generator: IcoMoon.io --><svg width="16" height="16" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="gray">
+  <g>
+    <path d="M 24.773,13.701c-0.651,0.669-7.512,7.205-7.512,7.205C 16.912,21.262, 16.456,21.44, 16,21.44c-0.458,0-0.914-0.178-1.261-0.534 c0,0-6.861-6.536-7.514-7.205c-0.651-0.669-0.696-1.87,0-2.586c 0.698-0.714, 1.669-0.77, 2.522,0L 16,17.112l 6.251-5.995 c 0.854-0.77, 1.827-0.714, 2.522,0C 25.47,11.83, 25.427,13.034, 24.773,13.701z">
+    </path>
+  </g>
+</svg>
+</a><a href="https://adminswerk.de/multi-line-string-yaml-ansible-II/#" class="reply">Reply</a></div><div class="isso-follow-up"><div id="isso-406" class="isso-comment isso-no-votes"><div class="avatar"><svg version="1.1" viewBox="0 0 48 48" preserveAspectRatio="xMinYMin meet" shape-rendering="crispEdges" data-hash="dc32922e6ebc"><rect x="0" y="0" width="56" height="56" style="fill: #f0f0f0"></rect><rect x="4" y="4" width="8" height="8" style="fill: #be5168"></rect><rect x="36" y="4" width="8" height="8" style="fill: #be5168"></rect><rect x="4" y="28" width="8" height="8" style="fill: #be5168"></rect><rect x="36" y="28" width="8" height="8" style="fill: #be5168"></rect><rect x="4" y="36" width="8" height="8" style="fill: #be5168"></rect><rect x="36" y="36" width="8" height="8" style="fill: #be5168"></rect><rect x="12" y="12" width="8" height="8" style="fill: #be5168"></rect><rect x="28" y="12" width="8" height="8" style="fill: #be5168"></rect><rect x="12" y="20" width="8" height="8" style="fill: #be5168"></rect><rect x="28" y="20" width="8" height="8" style="fill: #be5168"></rect><rect x="12" y="28" width="8" height="8" style="fill: #be5168"></rect><rect x="28" y="28" width="8" height="8" style="fill: #be5168"></rect><rect x="20" y="4" width="8" height="8" style="fill: #be5168"></rect><rect x="20" y="20" width="8" height="8" style="fill: #be5168"></rect><rect x="20" y="28" width="8" height="8" style="fill: #be5168"></rect><rect x="20" y="36" width="8" height="8" style="fill: #be5168"></rect></svg></div><div class="text-wrapper"><div role="meta" class="isso-comment-header"><a href="https://adminswerk.de/" rel="nofollow" class="author">m3adow</a><span class="spacer">•</span><a href="https://adminswerk.de/multi-line-string-yaml-ansible-II/#isso-406" class="permalink"><time title="Mon Mar 16 2020 14:32:16 GMT+0530 (India Standard Time)" datetime="2020-02-01T09:02:16Z">8 months ago</time></a><span class="note"></span></div><div class="text"><p>I can't say if you can use folded style instead of trim. It depends on your use case.</p>
+
+<p>I don't see a reason why to use a comma separated list in the yum-module either. You can feed a list to the "name" parameter which is easier and more clear.</p></div><div class="isso-comment-footer"><span class="votes">0</span><a href="https://adminswerk.de/multi-line-string-yaml-ansible-II/#" class="upvote"><!-- Generator: IcoMoon.io --><svg width="16" height="16" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="gray">
+  <g>
+    <path d="M 24.773,18.299c-0.651-0.669-7.512-7.203-7.512-7.203C 16.912,10.739, 16.456,10.56, 16,10.56c-0.458,0-0.914,0.179-1.261,0.536 c0,0-6.861,6.534-7.514,7.203c-0.651,0.669-0.696,1.872,0,2.586c 0.698,0.712, 1.669,0.77, 2.522,0L 16,14.89l 6.251,5.995 c 0.854,0.77, 1.827,0.712, 2.522,0C 25.47,20.17, 25.427,18.966, 24.773,18.299z">
+    </path>
+  </g>
+</svg>
+</a><span class="spacer">|</span><a href="https://adminswerk.de/multi-line-string-yaml-ansible-II/#" class="downvote"><!-- Generator: IcoMoon.io --><svg width="16" height="16" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="gray">
+  <g>
+    <path d="M 24.773,13.701c-0.651,0.669-7.512,7.205-7.512,7.205C 16.912,21.262, 16.456,21.44, 16,21.44c-0.458,0-0.914-0.178-1.261-0.534 c0,0-6.861-6.536-7.514-7.205c-0.651-0.669-0.696-1.87,0-2.586c 0.698-0.714, 1.669-0.77, 2.522,0L 16,17.112l 6.251-5.995 c 0.854-0.77, 1.827-0.714, 2.522,0C 25.47,11.83, 25.427,13.034, 24.773,13.701z">
+    </path>
+  </g>
+</svg>
+</a><a href="https://adminswerk.de/multi-line-string-yaml-ansible-II/#" class="reply">Reply</a></div><div class="isso-follow-up"></div></div></div></div></div></div></div></div>
+        <a href="https://posativ.org/isso/" id="isso-brlink">comments powered by <b>isso</b></a>
+        <div style="padding-top:1em">
+          <div class="adanchor">
+  <div class="adbox">
+    <h1 class="adcaption"><span class="adspan">Advertisement</span></h1>
+  <script async="" src="./Understanding multi line strings in YAML and Ansible (Part II - Ansible) › _dev_blog_ID10T_files/f.txt"></script>
+  <!-- id10t_manual_insert -->
+  <ins class="adsbygoogle gad_default" style="display:inline-block" data-ad-client="ca-pub-7586970907106458" data-ad-slot="2423736840"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+  </div>
+</div>
+
+        </div>
+        
+      
+
+
+    </article>
+
+    <footer>
+      <span><a href="https://adminswerk.de/impress/">Impress</a> • <a href="https://adminswerk.de/privacy-statement/">Privacy</a></span>
+      <span><a href="https://github.com/m3adow/"><i class="fa fa-github-square"></i></a><a href="https://bitbucket.org/m3adow/"><i class="fa fa-bitbucket-square"></i></a><a href="https://www.xing.com/profile/Till_Wiese"><i class="fa fa-xing-square"></i></a><a href="https://www.linkedin.com/pub/till-wiese/46/403/7b4"><i class="fa fa-linkedin-square"></i></a></span>
+      <span><a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="./Understanding multi line strings in YAML and Ansible (Part II - Ansible) › _dev_blog_ID10T_files/cc-by-sa.png"></a></span>
+    </footer>
+  
+
+</body></html>
