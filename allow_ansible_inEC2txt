@@ -18,41 +18,53 @@ When we use EC2 instance as host in our playbook following error is thrown as EC
 
 }
 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 To overcome this problem, we can perform the following steps:
-
+*********************************************************************************************************************************************************************************
 1 . Launch an EC2 instance in AWS.
+
 
 2 . Create a user in EC2 and create a password for it in this example we have created user ansible and provided password ansible123
 
-sudo adduser ansible
+$sudo adduser ansible
 
-sudo passwd ansible123
+$sudo passwd ansible123
 
-Add the user to sudoers in /etc/sudoers
+>Add the user to sudoers in /etc/sudoers
 
  ansible ALL=(ALL)   NOPASSWD:ALL
 
+
+
 3.  Edit /etc/sshd/sshd_config setting and uncomment the following line
 
-         PasswordAuthentication yes
+         uncomment-->PasswordAuthentication yes
+         comment out with #-->PasswordAuthentication no
+
 
 4. Restart the ssh daemon with
 
-sudo service ssh restart
+$sudo service ssh restart
+
+
 
 5. Now make following changes in your local VM
 
 Navigate to ansible.cfg file
 
-sudo vim /etc/ansible/ansible.cfg
+$sudo vim /etc/ansible/ansible.cfg
 
-Uncomment host_key_checking=False to disable SSH key host checking
+**Uncomment host_key_checking=False to disable SSH key host checking**
+
+
 
 6. Now add the IP, user name and password in /etc/ansible/hosts file
 
 [webserver]
 
 52.201.212.216   ansible_connection=ssh        ansible_user=ansible              ansible_ssh_pass=ansible123
+
+
 
 7. Now ping the host to check if SSH connection is established
 
@@ -65,9 +77,9 @@ Uncomment host_key_checking=False to disable SSH key host checking
 “ping”: “pong”
 
 }
-
+*********************************************************************************************************************************************************************************
 The changes needed to be made in  EC2 can be automated by adding the script given below in user data section while launching EC2  instance.
-
+*********************************************************************SCRIPT******************************************************************************************************
 #!/bin/bash
 
 sudo adduser ansible 
