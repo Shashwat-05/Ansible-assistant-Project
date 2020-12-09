@@ -1,0 +1,86 @@
+Ansible is an open source software that automates software provisioning, configuration management, and application deployment. Ansible connects via SSH, remote PowerShell or via other remote APIs.
+
+Ansible uses playbooks which is an organized unit of scripts that define work for a server configuration managed by the automation tool.
+
+Sometimes we have a requirement to run ansible playbook on EC2 instances from our local VM.
+
+The procedure to run playbook is to provide IP of hosts machines on which we want to run our tasks in ansible hosts file which is located at /etc/ansible/hosts and we are also required to generate ssh key and copy it over to host machine  in which we want to run our playbook.
+
+When we use EC2 instance as host in our playbook following error is thrown as EC2 instances require keypair to SSH into them.
+
+52.201.212.216| UNREACHABLE! => {
+
+    “changed”: false,
+
+    “msg“: “Failed to connect to the host via ssh: Permission denied (publickey,gssapi–keyex,gssapi-with-mic).\r\n”,
+
+    “unreachable”: true
+
+}
+
+To overcome this problem, we can perform the following steps:
+
+1 . Launch an EC2 instance in AWS.
+
+2 . Create a user in EC2 and create a password for it in this example we have created user ansible and provided password ansible123
+
+sudo adduser ansible
+
+sudo passwd ansible123
+
+Add the user to sudoers in /etc/sudoers
+
+ ansible ALL=(ALL)   NOPASSWD:ALL
+
+3.  Edit /etc/sshd/sshd_config setting and uncomment the following line
+
+         PasswordAuthentication yes
+
+4. Restart the ssh daemon with
+
+sudo service ssh restart
+
+5. Now make following changes in your local VM
+
+Navigate to ansible.cfg file
+
+sudo vim /etc/ansible/ansible.cfg
+
+Uncomment host_key_checking=False to disable SSH key host checking
+
+6. Now add the IP, user name and password in /etc/ansible/hosts file
+
+[webserver]
+
+52.201.212.216   ansible_connection=ssh        ansible_user=ansible              ansible_ssh_pass=ansible123
+
+7. Now ping the host to check if SSH connection is established
+
+   ansible  webserver –m ping   you should get the following message
+
+52.91.70.180 | SUCCESS => {
+
+“changed”: false,
+
+“ping”: “pong”
+
+}
+
+The changes needed to be made in  EC2 can be automated by adding the script given below in user data section while launching EC2  instance.
+
+#!/bin/bash
+
+sudo adduser ansible 
+
+PASSWD=”ansible123” 
+
+sudo echo ${PASSWD} | passwd –stdin ansible
+
+echo “ansible ALL=(ALL)   NOPASSWD:ALL” >> /etc/sudoers
+
+sudo sed –i ‘/PasswordAuthentication yes/s/^#//’ /etc/ssh/sshd_config
+
+sudo sed –i “s/PasswordAuthentication no/#PasswordAuthentication no/g” /etc/ssh/sshd_config
+
+sudo service sshd restart 
+
