@@ -85,6 +85,5 @@ backend static
 backend app
     balance     roundrobin
 {% for i in groups['Backend_servers'] %}
-
     server  app{{ loop.index }} {{ i }}:{{ port_bs }} check
 {% endfor %}
