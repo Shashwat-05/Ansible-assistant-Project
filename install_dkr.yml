@@ -1,0 +1,81 @@
+- hosts: localhost
+  ignore_errors: no
+  vars_prompt:
+
+  - name: cont_name
+    prompt: "enter container name"
+    private: no
+
+  tasks:
+  - name: copying docker repository..........
+    copy:
+          src: "/etc/yum.repos.d/docker.repo"
+          dest: "/etc/yum.repos.d/docker.repo"
+    notify: docker
+  - name: flushing handlers .............
+    meta: flush_handlers
+
+
+  - name: starting docker service.............
+    block:
+            - service:
+                    name: docker
+                    state: started
+                    enabled: yes
+    rescue:
+            - debug:
+                     msg: "service already started........."
+
+  - name: installing docker module
+    block:
+       - command: pip3 show docker
+     
+    rescue:
+       - pip:
+          name: docker-py
+   
+  - name: stopping selinux
+    selinux:
+            policy: targeted
+            state: permissive
+ 
+  - name: pulling docker image ....................       
+    docker_image:
+          name: "shashwatpp/sshcentos:14.2"
+          source: pull
+
+  - name: launching a container
+    docker_container:
+          name: "{{ cont_name }}"
+          image: "shashwatpp/sshcentos:14.2"
+          interactive: no
+          detach: yes
+          tty: no
+  
+  - name: "retrieving IP of {{ cont_name }} container"
+    docker_container_info:
+            name: "{{ cont_name }}"
+    register: dinfo
+    
+  - debug:
+            var: dinfo.container.NetworkSettings.IPAddress
+  - name: updating ansible inventory  with new docker info.......
+    blockinfile:
+            dest: "/ansibleip.txt"
+            block: |
+                    [docker]
+                    {{ dinfo['container']['NetworkSettings']['IPAddress'] }} ansible_user=root ansible_ssh_pass=root ansible_connection=ssh
+            marker: ""
+
+  
+  handlers:
+  - name: docker
+    yum:
+            name: docker-ce
+            state: present
+            allow_downgrade: yes
+            skip_broken: yes
+
+  
+      
+
