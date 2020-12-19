@@ -1,0 +1,24 @@
+- name: "configuring container {{ cont_name }}"
+  hosts: docker
+  vars_prompt:
+     
+          - name: html_file
+            private: no
+            prompt: enter the file name 
+          - name: cont
+            private: no
+            prompt: enter the html file content 
+          - name: cont_name
+            private: no
+            prompt: enter container name to configure
+  tasks:
+          - name: installing httpd service...........
+            package:
+                    name: httpd                 
+                    state: present
+          - name: creating the html file
+            copy:
+                content: "{{ cont }}"
+                dest: "/var/www/html/{{ html_file }}.html"
+          - name: starting httpd service
+            command: /usr/sbin/httpd
